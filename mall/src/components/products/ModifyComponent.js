@@ -1,14 +1,16 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {getOne} from "../../api/productsApi";
+import {deleteOne, getOne, putOne} from "../../api/productsApi";
 import FetchingModal from "../common/FetchingModal";
 import {API_SERVER_HOST} from "../../api/todoApi";
+import useCustomMove from "../../hooks/useCustomMove";
+import ResultModal from "../common/ResultModal";
 
 const initState = {
     pno:0,
     pname: '',
     pdesc: '',
     price: 0,
-    delflag:false,
+    delFlag:false,
     uploadedFileNames: []
 }
 
@@ -19,6 +21,10 @@ function ModifyComponent({pno}) {
     const [product, setProduct] = useState(initState)
 
     const [fetching, setFetching] = useState(false)
+
+    const [result, setResult] = useState(false)
+
+    const {moveToList, moveToRead} = useCustomMove()
 
     const uploadRef = useRef()
 
@@ -41,11 +47,61 @@ function ModifyComponent({pno}) {
 
     const deleteOldImages = (imageName) => {
 
-        const resultFileNames = product.uploadedFileNames.filter(fileName => fileName !== imageName)
-
-        product.uploadedFileNames = resultFileNames
+        product.uploadedFileNames = product.uploadedFileNames.filter(fileName => fileName !== imageName)
 
         setProduct({...product})
+    }
+
+    const handleClickModify = () => {
+
+        const files = uploadRef.current.files
+
+        const formData = new FormData()
+
+        for(let i = 0; i < files.length; i++) {
+
+            formData.append("files", files[i])
+        }
+
+        formData.append("pname", product.pname)
+        formData.append("pdesc", product.pdesc)
+        formData.append("price", product.price)
+        formData.append("delFlag", product.delFlag)
+
+        for(let i = 0; i < product.uploadedFileNames.length; i++) {
+
+            formData.append("uploadFileNames", product.uploadedFileNames[i])
+        }
+
+        setFetching(true)
+
+        putOne(pno, formData).then(data => {
+
+            setResult('Modified')
+            setFetching(false)
+        })
+
+    }
+
+    const handleClickDelete = () => {
+
+        setFetching(true)
+
+        deleteOne(pno).then(data => {
+            setResult("Deleted")
+            setFetching(false)
+        })
+    }
+
+    const closeModal = () => {
+
+        if(result === 'Modified') {
+            moveToRead(pno)
+        }else if(result === 'Deleted') {
+            moveToList({page:1})
+        }
+
+        setResult(null)
 
     }
 
@@ -53,6 +109,12 @@ function ModifyComponent({pno}) {
     return (
             <div className="border-2 border-sky-200 mt-10 m-2 p-4">
                 {fetching ? <FetchingModal/> : <></>}
+
+                {result? <ResultModal
+                    title={`${result}`}
+                    content={'처리되었습니다.'}
+                    callbackFn={closeModal}
+                ></ResultModal>:<></>}
 
                 <div className="flex justify-center">
                     <div className="relative mb-4 flex w-full flex-wrap items-stretch">
@@ -127,25 +189,45 @@ function ModifyComponent({pno}) {
 
                             {/* 조건부 렌더링 추가 */}
                             {product.uploadedFileNames && Array.isArray(product.uploadedFileNames) && product.uploadedFileNames.length > 0 ? (
-                                    product.uploadedFileNames.map((imgFile, i) =>
-                                    <div
-                                            className="flex justify-center flex-col w-1/3"
-                                            key={i}>
-                                        <button
-                                                className="bg-blue-500 text-3xl text-white"
-                                                onClick={() => deleteOldImages(imgFile)}
-                                        >DELETE</button>
-                                        <img
-                                                alt="img"
-                                                src={`${host}/api/products/view/s_${imgFile}`}/>
-
-                                    </div>
-                                    )) : (
-                                            <div className="w-full text-center">No images available</div>
+                                    product.uploadedFileNames.map((imgFile, i) => (
+                                            <div
+                                                    className="flex justify-center flex-col w-1/3"
+                                                    key={i}>
+                                                <button className="bg-blue-500 text-3xl text-white">DELETE</button>
+                                                <img
+                                                        alt="img"
+                                                        src={`${host}/api/products/view/s_${imgFile}`}/>
+                                            </div>
+                                    ))
+                            ) : (
+                                    <div className="w-full text-center">No images available</div>
                             )}
 
                         </div>
                     </div>
+                </div>
+                <div className="flex justify-end p-4">
+                    <button type="button"
+                            className="rounded p-4 m-2 text-xl w-32 text-white bg-red-500"
+                            onClick={handleClickDelete}
+                    >
+                        Delete
+                    </button>
+
+                    <button type="button"
+                            className="inline-block rounded p-4 m-2 text-xl w-32  text-white bg-orange-500"
+                            onClick={handleClickModify}
+                    >
+                        Modify
+                    </button>
+
+                    <button type="button"
+                            className="rounded p-4 m-2 text-xl w-32 text-white bg-blue-500"
+                            onClick={() => moveToList()}
+                    >
+                        List
+                    </button>
+
                 </div>
             </div>
     );
