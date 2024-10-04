@@ -1,3 +1,4 @@
+import LogoutComponent from "../../components/member/LogoutComponent";
 import BasicMenu from "../../components/menus/BasicMenu";
 
 const LogoutPage = () => {
@@ -7,6 +8,7 @@ const LogoutPage = () => {
       <BasicMenu/>
 
       <div className="w-full flex flex-wrap  h-full justify-center  items-center border-2">
+        <LogoutComponent></LogoutComponent>
       </div>  
     </div>
    );

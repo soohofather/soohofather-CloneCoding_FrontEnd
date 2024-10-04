@@ -14,6 +14,8 @@ const TodoIndex = lazy(() => import("../pages/todo/IndexPage"))
 
 const ProductsIndex = lazy(() => import("../pages/products/IndexPage"))
 
+
+
 const root = createBrowserRouter([
 
   {

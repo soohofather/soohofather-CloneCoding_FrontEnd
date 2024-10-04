@@ -1,11 +1,9 @@
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import {useSelector} from "react-redux";
 
 const BasicMenu = () => {
 
   const loginState = useSelector(state => state.loginSlice)
-
-  console.log("loginState...........:" + loginState)
 
   return (  
   <nav id='navbar' className=" flex  bg-blue-300">
@@ -19,7 +17,8 @@ const BasicMenu = () => {
           <Link to={'/about'}>About</Link>
         </li>
 
-        {loginState.email ?
+        {loginState.email ?  //로그인한 사용자만 출력되는 메뉴 
+        
         <>
         <li className="pr-6 text-2xl">
           <Link to={'/todo/'}>Todo</Link>
@@ -27,24 +26,28 @@ const BasicMenu = () => {
         <li className="pr-6 text-2xl">
           <Link to={'/products/'}>Products</Link>
         </li>
-        </> : <></>
+        </>
+        
+        :
+        <></>
         }
+
       </ul>
     </div>
-
+    
     <div className="w-1/5 flex justify-end bg-orange-300 p-4 font-medium">
-      { ! loginState.email ?
+    { ! loginState.email ?
+      
+      <div className="text-white text-sm m-1 rounded" >
+        <Link to={'/member/login'}>Login</Link>
+      </div>
+    : 
+    
+      <div className="text-white text-sm m-1 rounded" >
+        <Link to={'/member/logout'}>Logout</Link>
+      </div>
 
-              <div className="text-white text-sm m-1 rounded" >
-                <Link to={'/member/login'}>Login</Link>
-              </div>
-              :
-
-              <div className="text-white text-sm m-1 rounded" >
-                <Link to={'/member/logout'}>Logout</Link>
-              </div>
-
-      }
+    }
     </div>
   </nav>
   );

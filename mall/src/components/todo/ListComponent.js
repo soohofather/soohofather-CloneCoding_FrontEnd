@@ -9,7 +9,7 @@ const initState = {
   pageRequestDTO: null,
   prev: false,
   next: false,
-  totalCount: 0,
+  totoalCount: 0,
   prevPage: 0,
   nextPage: 0,
   totalPage: 0,
