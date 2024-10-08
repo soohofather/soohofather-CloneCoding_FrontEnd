@@ -1,4 +1,5 @@
 import axios from "axios";
+import {API_SERVER_HOST} from "./todoApi";
 
 const rest_api_key = 'ba0f4a7deec6bc4bb87fb3131763e54a'
 const redirect_uri = 'http://localhost:3000/member/kakao'
@@ -40,4 +41,12 @@ export const getAccessToken = async (authCode) => {
         console.error('Error fetching access token:', error);
         throw error; // 필요에 따라 에러를 처리하세요.
     }
+}
+
+export const getMemberWithAccessToken = async (accessToken) => {
+
+    const res = await axios.get(`${API_SERVER_HOST}/api/member/kakao?accessToken=${accessToken}`)
+
+    return res.data
+
 }
