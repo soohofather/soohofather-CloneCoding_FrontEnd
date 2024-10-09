@@ -33,10 +33,10 @@ const loginSlice = createSlice({
     login: (state, action) => {
       console.log("login.....")
       //{email, pw로 구성 }
-      const data = action.payload
+      setCookie("member", JSON.stringify(action.payload), 1)
       
       //새로운 상태 
-      return {email: data.email}
+      return action.payload
 
     },
     logout: (state, action) => {
